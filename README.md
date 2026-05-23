@@ -193,7 +193,6 @@ pip install python-dotenv
 
 - Multiple PDF support
 - Conversation history
-- User authentication
 - Duplicate PDF detection
 - Cloud deployment
 - Source citations for responses

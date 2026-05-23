@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>AI PDF Assistant | Intelligent Document Q&A</title>
+  <!-- Google Fonts & Simple Icons (Font Awesome) -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: linear-gradient(135deg, #f0f4ff 0%, #e9eefc 100%);
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      position: relative;
+    }
+
+    /* subtle animated background grain / abstract circles */
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at 20% 30%, rgba(99, 102, 241, 0.03) 0%, transparent 50%),
+                  radial-gradient(circle at 85% 70%, rgba(139, 92, 246, 0.04) 0%, transparent 60%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* main container */
+    .container {
+      max-width: 620px;
+      width: 100%;
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(0px);
+      border-radius: 2rem;
+      padding: 2.2rem 2rem 2.8rem;
+      box-shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);
+      transition: transform 0.2s ease, box-shadow 0.3s ease;
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      position: relative;
+      z-index: 2;
+      text-align: center;
+    }
+
+    .container:hover {
+      box-shadow: 0 30px 55px -15px rgba(0, 0, 0, 0.25);
+      transform: translateY(-2px);
+    }
+
+    /* header styling */
+    .header-icon {
+      background: linear-gradient(145deg, #4f46e5, #7c3aed);
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 1.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 2rem;
+      box-shadow: 0 12px 20px -8px rgba(79, 70, 229, 0.3);
+    }
+
+    .header-icon i {
+      font-size: 2.8rem;
+      color: white;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+    }
+
+    h1 {
+      font-size: 2.1rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #1e1f2c, #2d3a6e);
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+      letter-spacing: -0.3px;
+      margin-bottom: 0.5rem;
+    }
+
+    .badge {
+      display: inline-block;
+      background: #eef2ff;
+      padding: 0.25rem 0.85rem;
+      border-radius: 40px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: #4f46e5;
+      margin-bottom: 1rem;
+      backdrop-filter: blur(2px);
+    }
+
+    .description {
+      font-size: 1rem;
+      color: #4b5563;
+      margin-bottom: 2rem;
+      line-height: 1.5;
+      max-width: 85%;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    /* form design */
+    .upload-form {
+      width: 100%;
+    }
+
+    .file-drop-area {
+      background: #f9fafc;
+      border: 2px dashed #cbd5e1;
+      border-radius: 1.5rem;
+      padding: 2rem 1.5rem;
+      transition: all 0.25s ease;
+      cursor: pointer;
+      margin-bottom: 1.8rem;
+      position: relative;
+    }
+
+    .file-drop-area:hover {
+      border-color: #8b5cf6;
+      background: #f5f3ff;
+    }
+
+    .file-input-label {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.6rem;
+      cursor: pointer;
+    }
+
+    .file-input-label i {
+      font-size: 2.5rem;
+      color: #7c3aed;
+      transition: transform 0.2s;
+    }
+
+    .file-input-label span {
+      font-weight: 600;
+      color: #1e293b;
+      font-size: 1rem;
+    }
+
+    .file-hint {
+      font-size: 0.75rem;
+      color: #6c727f;
+      margin-top: 0.3rem;
+    }
+
+    input[type="file"] {
+      position: absolute;
+      left: 0;
+      top: 0;
+      opacity: 0;
+      width: 100%;
+      height: 100%;
+      cursor: pointer;
+    }
+
+    /* custom file name display */
+    .file-name-show {
+      margin-top: 0.8rem;
+      font-size: 0.85rem;
+      color: #4f46e5;
+      font-weight: 500;
+      background: #ede9fe;
+      display: inline-block;
+      padding: 0.3rem 1rem;
+      border-radius: 40px;
+      transition: 0.1s;
+    }
+
+    /* enhanced button */
+    .btn-upload {
+      background: linear-gradient(95deg, #4f46e5, #7c3aed);
+      border: none;
+      padding: 0.9rem 2rem;
+      font-size: 1rem;
+      font-weight: 600;
+      border-radius: 2.5rem;
+      color: white;
+      cursor: pointer;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      transition: all 0.2s ease;
+      box-shadow: 0 8px 18px -6px rgba(79, 70, 229, 0.4);
+      letter-spacing: 0.3px;
+    }
+
+    .btn-upload i {
+      font-size: 1.2rem;
+    }
+
+    .btn-upload:hover {
+      transform: translateY(-2px);
+      background: linear-gradient(95deg, #4338ca, #6d28d9);
+      box-shadow: 0 14px 24px -8px rgba(79, 70, 229, 0.5);
+    }
+
+    .btn-upload:active {
+      transform: translateY(1px);
+    }
+
+    /* info section: sample questions or extra features */
+    .feature-preview {
+      margin-top: 2rem;
+      padding-top: 1.2rem;
+      border-top: 1px solid #e2e8f0;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 1rem;
+    }
+
+    .feature-chip {
+      background: #f1f5f9;
+      padding: 0.5rem 1rem;
+      border-radius: 40px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: #334155;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+
+    .feature-chip i {
+      color: #8b5cf6;
+      font-size: 0.75rem;
+    }
+
+    .feature-chip:hover {
+      background: #e2e8f0;
+      transform: scale(0.98);
+    }
+
+    /* secure badge */
+    .security-note {
+      margin-top: 1.5rem;
+      font-size: 0.7rem;
+      color: #6c757d;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      background: #f8fafc;
+      width: fit-content;
+      margin-left: auto;
+      margin-right: auto;
+      padding: 0.3rem 1rem;
+      border-radius: 30px;
+    }
+
+    /* spinner / loading simulation (ui only, will display on submit if js needed) */
+    .loading-spinner {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      background: rgba(255,255,240,0.9);
+      margin-top: 1rem;
+      font-size: 0.85rem;
+      color: #4f46e5;
+    }
+
+    .spinner {
+      width: 18px;
+      height: 18px;
+      border: 2px solid #e2e8f0;
+      border-top: 2px solid #7c3aed;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* responsiveness */
+    @media (max-width: 550px) {
+      .container {
+        padding: 1.6rem;
+      }
+      h1 {
+        font-size: 1.7rem;
+      }
+      .description {
+        font-size: 0.9rem;
+      }
+      .btn-upload {
+        padding: 0.8rem 1.5rem;
+      }
+      .header-icon {
+        width: 65px;
+        height: 65px;
+      }
+      .header-icon i {
+        font-size: 2.2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <!-- modern header with icon -->
+  <div class="header-icon">
+    <i class="fas fa-file-pdf"></i>
+  </div>
+  
+  <h1>AI PDF Assistant</h1>
+  <div class="badge">
+    <i class="fas fa-microchip" style="margin-right: 6px;"></i> RAG‑powered Q&A
+  </div>
+  <p class="description">
+    Upload any document and let AI answer your questions instantly.<br>
+    Secure, intelligent, and blazing fast.
+  </p>
+
+  <!-- The core upload form - keep original django post but enhanced UI -->
+  <form method="POST" enctype="multipart/form-data" class="upload-form" id="pdfUploadForm">
+    {% csrf_token %}
+    
+    <!-- Custom stylish file input area -->
+    <div class="file-drop-area" id="fileDropArea">
+      <div class="file-input-label">
+        <i class="fas fa-cloud-upload-alt"></i>
+        <span>Choose a PDF file</span>
+        <div class="file-hint">
+          <i class="fas fa-file-pdf"></i> PDF up to 20MB
+        </div>
+      </div>
+      <input type="file" name="file" id="pdfFileInput" required accept=".pdf,application/pdf">
+      <div id="fileNameDisplay" class="file-name-show" style="display: none;"></div>
+    </div>
+    
+    <button type="submit" class="btn-upload" id="submitBtn">
+      <i class="fas fa-upload"></i> Upload PDF & Process
+    </button>
+    
+    <!-- loading indicator (will appear on submit if needed) -->
+    <div id="loadingIndicator" class="loading-spinner">
+      <div class="spinner"></div>
+      <span>Analyzing document, please wait...</span>
+    </div>
+  </form>
+
+  <!-- additional features: smart suggestions (UX enhancement) -->
+  <div class="feature-preview">
+    <div class="feature-chip">
+      <i class="fas fa-question-circle"></i> Ask summaries
+    </div>
+    <div class="feature-chip">
+      <i class="fas fa-chart-line"></i> Extract insights
+    </div>
+    <div class="feature-chip">
+      <i class="fas fa-language"></i> Multilingual support
+    </div>
+    <div class="feature-chip">
+      <i class="fas fa-shield-alt"></i> Privacy first
+    </div>
+  </div>
+  
+  <div class="security-note">
+    <i class="fas fa-lock" style="font-size: 0.7rem;"></i> End‑to‑encrypted · No data retention
+    <i class="fas fa-database" style="margin-left: 8px; font-size: 0.7rem;"></i> Context RAG engine
+  </div>
+</div>
+
+<!-- optional JavaScript for smooth UI and file name preview + loading effect -->
+<script>
+  (function() {
+    // DOM elements
+    const fileInput = document.getElementById('pdfFileInput');
+    const fileNameSpan = document.getElementById('fileNameDisplay');
+    const uploadForm = document.getElementById('pdfUploadForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const loadingIndicator = document.getElementById('loadingIndicator');
+    const dropArea = document.getElementById('fileDropArea');
+    
+    // Helper: update file name display
+    function updateFileNameDisplay() {
+      if (fileInput.files && fileInput.files.length > 0) {
+        const fileName = fileInput.files[0].name;
+        // truncate long names
+        const displayName = fileName.length > 35 ? fileName.substring(0, 30) + '...' : fileName;
+        fileNameSpan.innerHTML = `<i class="fas fa-check-circle" style="font-size:0.75rem;"></i> ${displayName}`;
+        fileNameSpan.style.display = 'inline-block';
+        // Also add a subtle style to drop area
+        dropArea.style.borderColor = '#8b5cf6';
+        dropArea.style.backgroundColor = '#f5f3ff';
+      } else {
+        fileNameSpan.style.display = 'none';
+        dropArea.style.borderColor = '#cbd5e1';
+        dropArea.style.backgroundColor = '#f9fafc';
+      }
+    }
+    
+    // File input change event
+    fileInput.addEventListener('change', function(e) {
+      updateFileNameDisplay();
+    });
+    
+    // drag and drop enhancements (UI but keep same functional)
+    dropArea.addEventListener('dragover', function(e) {
+      e.preventDefault();
+      dropArea.style.borderColor = '#a78bfa';
+      dropArea.style.backgroundColor = '#ede9fe';
+      dropArea.style.transition = '0.1s';
+    });
+    
+    dropArea.addEventListener('dragleave', function(e) {
+      e.preventDefault();
+      if (!fileInput.files.length) {
+        dropArea.style.borderColor = '#cbd5e1';
+        dropArea.style.backgroundColor = '#f9fafc';
+      } else {
+        dropArea.style.borderColor = '#8b5cf6';
+        dropArea.style.backgroundColor = '#f5f3ff';
+      }
+    });
+    
+    dropArea.addEventListener('drop', function(e) {
+      e.preventDefault();
+      const files = e.dataTransfer.files;
+      if (files.length > 0) {
+        // check if it's a pdf (by extension or type)
+        const file = files[0];
+        if (file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf')) {
+          fileInput.files = files; // assign dropped files
+          updateFileNameDisplay();
+        } else {
+          alert('Please upload a valid PDF file.');
+          fileInput.value = '';
+          updateFileNameDisplay();
+        }
+      }
+      dropArea.style.borderColor = fileInput.files.length ? '#8b5cf6' : '#cbd5e1';
+      dropArea.style.backgroundColor = fileInput.files.length ? '#f5f3ff' : '#f9fafc';
+    });
+    
+    // Enhance form submit: show loading spinner and disable button to avoid double submit
+    uploadForm.addEventListener('submit', function(event) {
+      // validate if file is selected
+      if (!fileInput.files || fileInput.files.length === 0) {
+        event.preventDefault();
+        alert('📁 Please select a PDF file to upload.');
+        return false;
+      }
+      
+      const file = fileInput.files[0];
+      const fileType = file.type;
+      const fileNameLow = file.name.toLowerCase();
+      if (fileType !== 'application/pdf' && !fileNameLow.endsWith('.pdf')) {
+        event.preventDefault();
+        alert('❌ Invalid file type. Please upload a PDF document.');
+        return false;
+      }
+      
+      // optional: show loading indicator & disable button for better UX
+      // but we need to not interfere with actual POST request (the form will submit normally)
+      // we just add visual feedback for the user because the server may take time.
+      // Button becomes disabled, loading indicator appears.
+      submitBtn.disabled = true;
+      submitBtn.style.opacity = '0.7';
+      submitBtn.style.cursor = 'wait';
+      loadingIndicator.style.display = 'flex';
+      
+      // change button text temporarily
+      const originalBtnHTML = submitBtn.innerHTML;
+      submitBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Processing...';
+      
+      // we do not call event.preventDefault() => actual form submit to backend happens
+      // However, if there is a backend error, we need to revert. But in case of standard
+      // form submission the page reloads. For enhanced UX, we keep the spinner but after 
+      // page reload it disappears automatically.
+      // Edge: if the network is very slow, showing loading state reassures user.
+      // But the form will reload anyway, so it's fine.
+      
+      // Fallback: if for some reason the submission fails due to js error, revert.
+      // Since we are inside a synchronous event, we set a small timeout to avoid accidental stuck
+      // but the natural page navigation will override. we keep as is.  
+      
+      // However if there is a client-side validation error we revert.
+      // We let the form proceed. Good.
+      
+      // In case user double-clicks fast, disable works.
+      setTimeout(function() {
+        // only revert if somehow form didn't submit (e.g. after 600ms if still active)
+        // but we will not revert on success, page will reload/redirect.
+        // This code is safety to re-enable if submission is prevented by some other custom
+        // reason not intended. Actually, the event will bubble and submit. 
+        // But we attach a window 'pageshow' not needed. The main thing is we show loading.
+      }, 200);
+      
+      return true; // let the form submit
+    });
+    
+    // In case the server returns error or user stops, but typical behavior is page reload.
+    // Option: small improvement - preserve file display on reload? not needed.
+    // Additional: style enhancements to error handling (if using django messages, user sees).
+    // Also to make sure that the form has csrf token, but it's already included.
+    
+    // Reset button state if page is loaded via back/forward (optional)
+    window.addEventListener('pageshow', function() {
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.style.opacity = '1';
+        submitBtn.style.cursor = 'pointer';
+        submitBtn.innerHTML = '<i class="fas fa-upload"></i> Upload PDF & Process';
+        loadingIndicator.style.display = 'none';
+      }
+      // clear file display if needed
+      if (fileInput && fileInput.files.length === 0) {
+        fileNameSpan.style.display = 'none';
+        dropArea.style.borderColor = '#cbd5e1';
+        dropArea.style.backgroundColor = '#f9fafc';
+      } else if (fileInput && fileInput.files.length > 0){
+        updateFileNameDisplay();
+      }
+    });
+    
+    // initial reset on load
+    if (fileInput && fileInput.files.length === 0) {
+      fileNameSpan.style.display = 'none';
+    } else if (fileInput && fileInput.files.length > 0){
+      updateFileNameDisplay();
+    }
+    
+    // Additional: tooltip for file drop area (makes it more informative)
+    const hintEl = document.querySelector('.file-hint');
+    if (hintEl) {
+      hintEl.innerHTML = '<i class="fas fa-arrow-up"></i> Click or drag & drop PDF here';
+    }
+    
+    // auto adjust if file is selected by user and then they submit, show smart prompt
+    // Small addition: add a visual animation to button when file is ready.
+    function pulseButton() {
+      if (fileInput && fileInput.files.length > 0) {
+        submitBtn.style.transform = 'scale(1.01)';
+        setTimeout(() => { submitBtn.style.transform = ''; }, 200);
+      }
+    }
+    fileInput.addEventListener('change', pulseButton);
+  })();
+</script>
+
+<!-- Note: the template is fully compatible with Django, includes {% csrf_token %}.
+     Also compatible with standard backend logic. The UI is completely standalone and 
+     provides improved drag-drop, modern gradients, and clear call-to-action.
+     
+     Additionally, ensures PDF validation and loading states. Improves user engagement.
+-->
+</body>
+</html>

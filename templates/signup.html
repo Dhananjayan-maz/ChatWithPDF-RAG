@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Create Account | Signup</title>
+    <!-- Google Fonts + Font Awesome Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+            position: relative;
+        }
+
+        /* animated background overlay */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2000 2000"><path fill="rgba(255,255,255,0.03)" d="M0,0 L2000,0 L2000,2000 L0,2000 Z M100,100 L1900,100 L1900,1900 L100,1900 Z" stroke="rgba(255,255,255,0.05)" stroke-width="2"/><circle cx="500" cy="500" r="300" fill="rgba(255,255,255,0.02)"/><circle cx="1500" cy="1500" r="400" fill="rgba(255,255,255,0.02)"/></svg>') repeat;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* main card container */
+        .signup-container {
+            max-width: 500px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(0px);
+            border-radius: 2rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 8px 20px -6px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            z-index: 2;
+        }
+
+        .signup-container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.3);
+        }
+
+        /* header section with brand */
+        .signup-header {
+            background: linear-gradient(145deg, #ffffff, #f8f9ff);
+            padding: 2rem 2rem 1.5rem 2rem;
+            text-align: center;
+            border-bottom: 1px solid #eef2ff;
+        }
+
+        .logo-icon {
+            background: linear-gradient(145deg, #667eea, #764ba2);
+            width: 70px;
+            height: 70px;
+            margin: 0 auto 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 1.5rem;
+            box-shadow: 0 10px 20px -5px rgba(102, 126, 234, 0.4);
+        }
+
+        .logo-icon i {
+            font-size: 2.2rem;
+            color: white;
+        }
+
+        h1 {
+            font-size: 1.9rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #1e1f2c, #4a3a6e);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            letter-spacing: -0.3px;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            color: #6c727f;
+            font-size: 0.9rem;
+            margin-top: 0.3rem;
+        }
+
+        /* form styling */
+        .signup-form {
+            padding: 2rem 2rem 1.8rem;
+        }
+
+        /* enhanced Django form fields */
+        .signup-form input, 
+        .signup-form select, 
+        .signup-form textarea {
+            width: 100%;
+            padding: 0.9rem 1rem 0.9rem 2.8rem;
+            font-size: 0.95rem;
+            font-family: 'Inter', sans-serif;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 1rem;
+            transition: all 0.2s ease;
+            background: #fefefe;
+            outline: none;
+            color: #1e293b;
+        }
+
+        .signup-form input:focus,
+        .signup-form select:focus,
+        .signup-form textarea:focus {
+            border-color: #8b5cf6;
+            box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.1);
+            background: white;
+        }
+
+        /* custom field wrapper for icons */
+        .field-wrapper {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+
+        .field-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+            font-size: 1rem;
+            transition: color 0.2s;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .field-wrapper:focus-within .field-icon {
+            color: #8b5cf6;
+        }
+
+        /* specific styling for checkbox fields (if any) */
+        .signup-form input[type="checkbox"] {
+            width: auto;
+            padding: 0;
+            margin-right: 0.5rem;
+            transform: translateY(2px);
+        }
+
+        /* Django form row overrides */
+        .signup-form p {
+            margin-bottom: 1rem;
+            position: relative;
+        }
+
+        /* styling form labels inside Django form.as_p */
+        .signup-form label {
+            display: block;
+            margin-bottom: 0.4rem;
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #334155;
+            letter-spacing: -0.2px;
+        }
+
+        /* override django default input wrapper to match our design */
+        .signup-form input, 
+        .signup-form select, 
+        .signup-form textarea {
+            width: 100%;
+            padding: 0.9rem 1rem 0.9rem 2.8rem;
+        }
+
+        /* special case for password fields - we keep same */
+        .signup-form input[type="password"] {
+            padding: 0.9rem 1rem 0.9rem 2.8rem;
+        }
+
+        /* error messages styling */
+        .errorlist {
+            list-style: none;
+            background: #fee2e2;
+            color: #dc2626;
+            padding: 0.5rem 1rem;
+            border-radius: 0.75rem;
+            font-size: 0.75rem;
+            margin-top: 0.4rem;
+            margin-bottom: 0;
+            font-weight: 500;
+        }
+
+        .errorlist li {
+            margin: 0;
+        }
+
+        /* help text */
+        .helptext {
+            font-size: 0.7rem;
+            color: #6c727f;
+            display: block;
+            margin-top: 0.3rem;
+        }
+
+        /* submit button */
+        .btn-submit {
+            width: 100%;
+            background: linear-gradient(95deg, #667eea, #764ba2);
+            border: none;
+            padding: 1rem;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 1rem;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.25s ease;
+            box-shadow: 0 8px 20px -6px rgba(102, 126, 234, 0.4);
+            margin-top: 0.5rem;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .btn-submit i {
+            font-size: 1.1rem;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            background: linear-gradient(95deg, #5a67d8, #6b46a0);
+            box-shadow: 0 12px 25px -8px rgba(102, 126, 234, 0.5);
+        }
+
+        .btn-submit:active {
+            transform: translateY(1px);
+        }
+
+        /* footer links */
+        .signup-footer {
+            text-align: center;
+            padding: 1rem 2rem 2rem;
+            border-top: 1px solid #edf2f7;
+            background: #fafcff;
+        }
+
+        .login-link {
+            color: #5b6b8c;
+            font-size: 0.9rem;
+        }
+
+        .login-link a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.2s;
+        }
+
+        .login-link a:hover {
+            color: #764ba2;
+            text-decoration: underline;
+        }
+
+        /* Terms & conditions row */
+        .terms-row {
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+            margin: 1rem 0 1.2rem;
+            font-size: 0.8rem;
+            color: #4b5563;
+        }
+
+        .terms-row input {
+            width: 18px;
+            height: 18px;
+            margin: 0;
+            padding: 0;
+            accent-color: #667eea;
+            cursor: pointer;
+        }
+
+        .terms-row label {
+            cursor: pointer;
+            margin: 0;
+            font-weight: 400;
+        }
+
+        /* responsive adjustments */
+        @media (max-width: 550px) {
+            .signup-header {
+                padding: 1.5rem 1.2rem;
+            }
+            .signup-form {
+                padding: 1.5rem;
+            }
+            h1 {
+                font-size: 1.6rem;
+            }
+            .logo-icon {
+                width: 55px;
+                height: 55px;
+            }
+            .logo-icon i {
+                font-size: 1.8rem;
+            }
+        }
+
+        /* custom styling for password strength indicator (optional) */
+        .password-hint {
+            font-size: 0.7rem;
+            color: #6c727f;
+            margin-top: 0.2rem;
+        }
+
+        /* animation on load */
+        @keyframes fadeSlideUp {
+            from {
+                opacity: 0;
+                transform: translateY(25px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .signup-container {
+            animation: fadeSlideUp 0.5s ease-out;
+        }
+    </style>
+</head>
+<body>
+
+<div class="signup-container">
+    <div class="signup-header">
+        <div class="logo-icon">
+            <i class="fas fa-user-plus"></i>
+        </div>
+        <h1>Create Account</h1>
+        <div class="subtitle">
+            <i class="fas fa-sparkle" style="font-size: 0.75rem;"></i> Join us and start your journey
+        </div>
+    </div>
+
+    <div class="signup-form">
+        <form method="post" id="signupForm" novalidate>
+            {% csrf_token %}
+            
+            <!-- Django form with enhanced styling via custom template filter or manual field rendering -->
+            {% if form.non_field_errors %}
+                <div class="errorlist nonfield">
+                    {% for error in form.non_field_errors %}
+                        <p class="errornote">{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            {% for field in form %}
+                <div class="field-wrapper" data-field="{{ field.name }}">
+                    <!-- Add dynamic icon based on field name -->
+                    {% if field.name|lower == 'username' or field.name|lower == 'name' %}
+                        <i class="fas fa-user field-icon"></i>
+                    {% elif field.name|lower == 'email' %}
+                        <i class="fas fa-envelope field-icon"></i>
+                    {% elif field.name|lower == 'password' or field.name|lower == 'password1' %}
+                        <i class="fas fa-lock field-icon"></i>
+                    {% elif field.name|lower == 'password2' or field.name|lower == 'confirm_password' %}
+                        <i class="fas fa-check-circle field-icon"></i>
+                    {% else %}
+                        <i class="fas fa-pen field-icon"></i>
+                    {% endif %}
+                    
+                    {{ field.label_tag }}
+                    {{ field }}
+                    
+                    {% if field.help_text %}
+                        <small class="helptext">{{ field.help_text|safe }}</small>
+                    {% endif %}
+                    
+                    {% if field.errors %}
+                        <ul class="errorlist">
+                            {% for error in field.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+            {% endfor %}
+
+            <!-- Custom terms and conditions (adds extra UX) -->
+            <div class="terms-row">
+                <input type="checkbox" id="termsCheckbox" required>
+                <label for="termsCheckbox">
+                    I agree to the <a href="#" style="color:#667eea; text-decoration:none;">Terms of Service</a> and 
+                    <a href="#" style="color:#667eea; text-decoration:none;">Privacy Policy</a>
+                </label>
+            </div>
+
+            <button type="submit" class="btn-submit" id="submitBtn">
+                <i class="fas fa-arrow-right"></i> Sign Up
+            </button>
+        </form>
+    </div>
+
+    <div class="signup-footer">
+        <div class="login-link">
+            Already have an account? <a href="/signin">Log in</a>
+        </div>
+        <div style="margin-top: 0.8rem; font-size: 0.7rem; color: #9ca3af;">
+            <i class="fas fa-shield-alt"></i> Secure & encrypted
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript for additional interactive enhancements (terms validation, loading state, etc) -->
+<script>
+    (function() {
+        const form = document.getElementById('signupForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const termsCheckbox = document.getElementById('termsCheckbox');
+        
+        // Helper to add loading state and disable double submission
+        let isSubmitting = false;
+        
+        // add icons to Django's input fields that don't have wrapper? Already handled by template, but also for fallback.
+        // Ensure that all input fields get proper class for consistent styling
+        function enhanceFields() {
+            const inputs = document.querySelectorAll('.signup-form input, .signup-form select, .signup-form textarea');
+            inputs.forEach(input => {
+                if (!input.classList.contains('enhanced')) {
+                    input.classList.add('enhanced');
+                    // add some extra styling for password managers
+                    if (input.type === 'password') {
+                        input.setAttribute('autocomplete', 'new-password');
+                    }
+                }
+            });
+        }
+        
+        // Terms validation before submit
+        form.addEventListener('submit', function(event) {
+            // Prevent if terms not accepted
+            if (termsCheckbox && !termsCheckbox.checked) {
+                event.preventDefault();
+                alert('Please accept the Terms of Service and Privacy Policy to continue.');
+                termsCheckbox.focus();
+                return false;
+            }
+            
+            // Additional client-side password match if password fields exist (to complement Django)
+            const passwordFields = document.querySelectorAll('input[type="password"]');
+            let passwordVal = '';
+            let confirmVal = '';
+            passwordFields.forEach(field => {
+                const fieldName = field.name.toLowerCase();
+                if (fieldName.includes('password') && !fieldName.includes('confirm') && !fieldName.includes('password2')) {
+                    passwordVal = field.value;
+                }
+                if (fieldName.includes('confirm') || fieldName.includes('password2')) {
+                    confirmVal = field.value;
+                }
+            });
+            if (passwordVal !== '' && confirmVal !== '' && passwordVal !== confirmVal) {
+                event.preventDefault();
+                alert('Passwords do not match. Please re-enter.');
+                return false;
+            }
+            
+            if (isSubmitting) {
+                event.preventDefault();
+                return false;
+            }
+            
+            // Show loading indicator on button
+            isSubmitting = true;
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Creating account...';
+            submitBtn.disabled = true;
+            // In case of any errors, we need to re-enable, but form will reload normally
+            // however if form has backend validation errors page will re-render with errors.
+            // We will re-enable on window load if needed.
+            setTimeout(() => {
+                // safety: if form hasn't been submitted for 10 seconds due to network, re-enable? but skip
+            }, 3000);
+            return true;
+        });
+        
+        // If there are any server-side errors, re-enable button
+        window.addEventListener('load', function() {
+            enhanceFields();
+            // Check if the page contains error messages, then re-enable submit button
+            const hasErrors = document.querySelectorAll('.errorlist').length > 0;
+            if (hasErrors && submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-arrow-right"></i> Sign Up';
+                isSubmitting = false;
+            } else {
+                // No errors, button is active but ensure it's not disabled from previous state
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                }
+                isSubmitting = false;
+            }
+            
+            // Add floating label effect? optional but not needed
+            const fields = document.querySelectorAll('.field-wrapper input, .field-wrapper select, .field-wrapper textarea');
+            fields.forEach(field => {
+                if (field.value && field.value.trim() !== '') {
+                    field.classList.add('has-value');
+                }
+                field.addEventListener('input', function() {
+                    if (this.value.trim() !== '') {
+                        this.classList.add('has-value');
+                    } else {
+                        this.classList.remove('has-value');
+                    }
+                });
+            });
+            
+            // auto-focus first empty field
+            const firstInput = document.querySelector('.signup-form input:not([type="hidden"])');
+            if (firstInput && !firstInput.value) {
+                firstInput.focus();
+            }
+        });
+        
+        // Pre-fill terms checkbox if required field, but not pre-checked for user consent.
+        // additional live password strength visual (optional)
+        const pwdField = document.querySelector('input[type="password"][name*="password"]:not([name*="confirm"])');
+        if (pwdField) {
+            pwdField.addEventListener('input', function(e) {
+                const val = e.target.value;
+                let strength = 0;
+                if (val.length >= 8) strength++;
+                if (/[A-Z]/.test(val)) strength++;
+                if (/[0-9]/.test(val)) strength++;
+                if (/[^A-Za-z0-9]/.test(val)) strength++;
+                // optional indicator: maybe add small text next to field (lightweight)
+                let hintSpan = pwdField.parentNode.querySelector('.password-strength-hint');
+                if (!hintSpan && pwdField.parentNode) {
+                    hintSpan = document.createElement('small');
+                    hintSpan.className = 'password-hint password-strength-hint';
+                    pwdField.parentNode.appendChild(hintSpan);
+                }
+                if (hintSpan) {
+                    if (strength === 0) hintSpan.innerHTML = '';
+                    else if (strength <= 2) hintSpan.innerHTML = '🔒 Weak password — add uppercase, number or symbol';
+                    else if (strength === 3) hintSpan.innerHTML = '👍 Medium strength';
+                    else hintSpan.innerHTML = '✅ Strong password!';
+                    if (strength > 0) hintSpan.style.display = 'block';
+                    else hintSpan.style.display = 'none';
+                }
+            });
+        }
+        
+        // Additional: Style error lists more friendly
+        const styleErrors = () => {
+            const errs = document.querySelectorAll('.errorlist');
+            errs.forEach(err => {
+                err.style.marginTop = '0.4rem';
+                err.style.marginBottom = '0';
+            });
+        };
+        styleErrors();
+    })();
+</script>
+
+<!-- Additional styles to ensure consistent rendering for Django default form fields -->
+<style>
+    /* Override default django form display quirks */
+    .signup-form input, .signup-form select, .signup-form textarea {
+        width: 100%;
+    }
+    .field-wrapper {
+        position: relative;
+        margin-bottom: 1.5rem;
+    }
+    .field-wrapper input, .field-wrapper select, .field-wrapper textarea {
+        padding-left: 2.6rem !important;
+    }
+    .field-icon {
+        position: absolute;
+        left: 0.9rem;
+        top: 2.3rem;
+        transform: translateY(-50%);
+        font-size: 1rem;
+    }
+    /* adjust top position for label+icon combo */
+    .field-wrapper label {
+        margin-bottom: 0.3rem;
+        display: inline-block;
+        font-weight: 600;
+        font-size: 0.85rem;
+        color: #334155;
+    }
+    .field-wrapper .helptext {
+        margin-top: 0.3rem;
+        font-size: 0.7rem;
+    }
+    .terms-row {
+        margin: 1rem 0 1rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .btn-submit:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+        transform: none;
+    }
+    .errorlist.nonfield {
+        background: #fee2e2;
+        padding: 0.6rem;
+        border-radius: 0.8rem;
+        margin-bottom: 1rem;
+        font-size: 0.8rem;
+    }
+    a {
+        text-decoration: none;
+    }
+    .signup-footer a:hover {
+        text-decoration: underline;
+    }
+    /* small responsive tweaks */
+    @media (max-width: 480px) {
+        .field-icon {
+            top: 2.2rem;
+            left: 0.7rem;
+            font-size: 0.85rem;
+        }
+        .signup-form input, .signup-form select {
+            padding-left: 2.3rem !important;
+        }
+    }
+</style>
+
+</body>
+</html>

@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Sign In | Welcome Back</title>
+    <!-- Google Fonts + Font Awesome Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #2e1065 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* animated particles / background effect */
+        body::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image: radial-gradient(circle at 20% 40%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
+                              radial-gradient(circle at 80% 70%, rgba(59, 130, 246, 0.08) 0%, transparent 60%);
+            pointer-events: none;
+        }
+
+        /* floating shapes animation */
+        .bg-shape {
+            position: fixed;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(139,92,246,0.15) 0%, transparent 70%);
+            animation: float 20s infinite ease-in-out;
+            z-index: 0;
+        }
+        .shape-1 { top: -100px; left: -100px; animation-delay: 0s; }
+        .shape-2 { bottom: -120px; right: -80px; width: 350px; height: 350px; animation-delay: 5s; background: radial-gradient(circle, rgba(59,130,246,0.12) 0%, transparent 70%);}
+        .shape-3 { top: 30%; right: -50px; width: 200px; height: 200px; animation-delay: 10s; background: radial-gradient(circle, rgba(236,72,153,0.08) 0%, transparent 70%);}
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(30px, 20px) scale(1.05); }
+        }
+
+        /* main card container */
+        .login-container {
+            max-width: 460px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(0px);
+            border-radius: 2rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.1);
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            z-index: 2;
+        }
+
+        .login-container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.4);
+        }
+
+        /* header section */
+        .login-header {
+            background: linear-gradient(115deg, #ffffff, #faf9fe);
+            padding: 2rem 2rem 1.5rem 2rem;
+            text-align: center;
+            border-bottom: 1px solid #eef2ff;
+        }
+
+        .logo-icon {
+            background: linear-gradient(145deg, #4f46e5, #7c3aed);
+            width: 70px;
+            height: 70px;
+            margin: 0 auto 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 1.5rem;
+            box-shadow: 0 12px 24px -8px rgba(79, 70, 229, 0.4);
+            transition: transform 0.2s;
+        }
+
+        .logo-icon i {
+            font-size: 2.2rem;
+            color: white;
+        }
+
+        h1 {
+            font-size: 1.9rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #1e1b4b, #4c1d95);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            letter-spacing: -0.3px;
+            margin-bottom: 0.5rem;
+        }
+
+        .welcome-text {
+            color: #6c727f;
+            font-size: 0.9rem;
+            margin-top: 0.3rem;
+        }
+
+        /* form styling */
+        .login-form {
+            padding: 2rem 2rem 1.5rem;
+        }
+
+        /* enhanced Django form fields */
+        .field-wrapper {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+
+        .field-wrapper label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #334155;
+            letter-spacing: -0.2px;
+        }
+
+        .field-wrapper input,
+        .field-wrapper select,
+        .field-wrapper textarea {
+            width: 100%;
+            padding: 0.9rem 1rem 0.9rem 2.8rem;
+            font-size: 0.95rem;
+            font-family: 'Inter', sans-serif;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 1rem;
+            transition: all 0.2s ease;
+            background: #fefefe;
+            outline: none;
+            color: #1e293b;
+        }
+
+        .field-wrapper input:focus,
+        .field-wrapper select:focus {
+            border-color: #8b5cf6;
+            box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.1);
+            background: white;
+        }
+
+        .field-icon {
+            position: absolute;
+            left: 1rem;
+            top: 2.5rem;
+            transform: translateY(-50%);
+            color: #94a3b8;
+            font-size: 1rem;
+            transition: color 0.2s;
+            pointer-events: none;
+        }
+
+        .field-wrapper:focus-within .field-icon {
+            color: #8b5cf6;
+        }
+
+        /* Django form specific overrides */
+        .login-form p {
+            margin-bottom: 1.2rem;
+            position: relative;
+        }
+
+        /* error messages */
+        .errorlist {
+            list-style: none;
+            background: #fee2e2;
+            color: #dc2626;
+            padding: 0.5rem 1rem;
+            border-radius: 0.75rem;
+            font-size: 0.75rem;
+            margin-top: 0.4rem;
+            margin-bottom: 0;
+            font-weight: 500;
+        }
+
+        .errorlist li {
+            margin: 0;
+        }
+
+        /* help text */
+        .helptext {
+            font-size: 0.7rem;
+            color: #6c727f;
+            display: block;
+            margin-top: 0.3rem;
+        }
+
+        /* additional options row (remember me + forgot password) */
+        .form-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 1rem 0 1.5rem;
+            font-size: 0.85rem;
+        }
+
+        .remember-me {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+        }
+
+        .remember-me input {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+            accent-color: #4f46e5;
+            margin: 0;
+        }
+
+        .remember-me label {
+            cursor: pointer;
+            color: #4b5563;
+            font-weight: 500;
+        }
+
+        .forgot-link {
+            color: #4f46e5;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.2s;
+        }
+
+        .forgot-link:hover {
+            color: #7c3aed;
+            text-decoration: underline;
+        }
+
+        /* submit button */
+        .btn-login {
+            width: 100%;
+            background: linear-gradient(95deg, #4f46e5, #7c3aed);
+            border: none;
+            padding: 1rem;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 1rem;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.25s ease;
+            box-shadow: 0 8px 20px -6px rgba(79, 70, 229, 0.4);
+            font-family: 'Inter', sans-serif;
+        }
+
+        .btn-login i {
+            font-size: 1rem;
+        }
+
+        .btn-login:hover {
+            transform: translateY(-2px);
+            background: linear-gradient(95deg, #4338ca, #6d28d9);
+            box-shadow: 0 12px 25px -8px rgba(79, 70, 229, 0.5);
+        }
+
+        .btn-login:active {
+            transform: translateY(1px);
+        }
+
+        .btn-login:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* footer / signup link */
+        .login-footer {
+            text-align: center;
+            padding: 1.2rem 2rem 2rem;
+            border-top: 1px solid #edf2f7;
+            background: #fafcff;
+        }
+
+        .signup-link {
+            color: #5b6b8c;
+            font-size: 0.9rem;
+        }
+
+        .signup-link a {
+            color: #4f46e5;
+            text-decoration: none;
+            font-weight: 700;
+            transition: color 0.2s;
+        }
+
+        .signup-link a:hover {
+            color: #7c3aed;
+            text-decoration: underline;
+        }
+
+        .secure-badge {
+            margin-top: 1rem;
+            font-size: 0.7rem;
+            color: #9ca3af;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        /* social login alternative (optional) */
+        .social-divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 1.5rem 0 1rem;
+            color: #94a3b8;
+            font-size: 0.75rem;
+        }
+
+        .social-divider::before,
+        .social-divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .social-divider::before {
+            margin-right: 1rem;
+        }
+
+        .social-divider::after {
+            margin-left: 1rem;
+        }
+
+        .social-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        .social-btn {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.6rem;
+            padding: 0.7rem;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 0.8rem;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #334155;
+            text-decoration: none;
+        }
+
+        .social-btn:hover {
+            border-color: #8b5cf6;
+            background: #faf5ff;
+            transform: translateY(-1px);
+        }
+
+        .social-btn i {
+            font-size: 1.1rem;
+        }
+
+        .fa-google { color: #ea4335; }
+        .fa-github { color: #333; }
+
+        /* animation on load */
+        @keyframes fadeSlideUp {
+            from {
+                opacity: 0;
+                transform: translateY(25px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .login-container {
+            animation: fadeSlideUp 0.5s ease-out;
+        }
+
+        /* responsive */
+        @media (max-width: 500px) {
+            .login-header {
+                padding: 1.5rem 1.2rem;
+            }
+            .login-form {
+                padding: 1.5rem;
+            }
+            h1 {
+                font-size: 1.6rem;
+            }
+            .logo-icon {
+                width: 55px;
+                height: 55px;
+            }
+            .logo-icon i {
+                font-size: 1.8rem;
+            }
+            .form-options {
+                flex-direction: column;
+                gap: 0.8rem;
+                align-items: flex-start;
+            }
+            .social-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="bg-shape shape-1"></div>
+<div class="bg-shape shape-2"></div>
+<div class="bg-shape shape-3"></div>
+
+<div class="login-container">
+    <div class="login-header">
+        <div class="logo-icon">
+            <i class="fas fa-key"></i>
+        </div>
+        <h1>Welcome Back</h1>
+        <div class="welcome-text">
+            <i class="fas fa-smile-wink"></i> Sign in to continue your journey
+        </div>
+    </div>
+
+    <div class="login-form">
+        <form method="POST" id="loginForm" novalidate>
+            {% csrf_token %}
+            
+            <!-- Display non-field errors (e.g., invalid credentials) -->
+            {% if form.non_field_errors %}
+                <div class="errorlist nonfield" style="margin-bottom: 1rem;">
+                    {% for error in form.non_field_errors %}
+                        <p style="margin: 0;">{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <!-- Custom rendering of form fields with icons -->
+            {% for field in form %}
+                <div class="field-wrapper">
+                    <!-- Add dynamic icon based on field name -->
+                    {% if field.name|lower == 'username' or field.name|lower == 'email' %}
+                        <i class="fas fa-envelope field-icon"></i>
+                    {% elif field.name|lower == 'password' %}
+                        <i class="fas fa-lock field-icon"></i>
+                    {% else %}
+                        <i class="fas fa-user field-icon"></i>
+                    {% endif %}
+                    
+                    {{ field.label_tag }}
+                    {{ field }}
+                    
+                    {% if field.help_text %}
+                        <small class="helptext">{{ field.help_text|safe }}</small>
+                    {% endif %}
+                    
+                    {% if field.errors %}
+                        <ul class="errorlist">
+                            {% for error in field.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+            {% endfor %}
+
+            <!-- Additional options: Remember Me & Forgot Password -->
+            <div class="form-options">
+                <label class="remember-me">
+                    <input type="checkbox" name="remember_me" id="rememberMe">
+                    <span>Remember me</span>
+                </label>
+                <a href="#" class="forgot-link">Forgot password?</a>
+            </div>
+
+            <button type="submit" class="btn-login" id="loginBtn">
+                <i class="fas fa-arrow-right-to-bracket"></i> Sign In
+            </button>
+
+            <!-- Optional social login section (enhancement) -->
+            <div class="social-divider">or continue with</div>
+            <div class="social-buttons">
+                <a href="#" class="social-btn" id="googleLogin">
+                    <i class="fab fa-google"></i> Google
+                </a>
+                <a href="#" class="social-btn" id="githubLogin">
+                    <i class="fab fa-github"></i> GitHub
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <div class="login-footer">
+        <div class="signup-link">
+            Don't have an account? <a href="/signup">Create account</a>
+        </div>
+        <div class="secure-badge">
+            <i class="fas fa-shield-alt"></i> Secured with SSL encryption
+            <i class="fas fa-circle" style="font-size: 0.3rem;"></i>
+            <i class="fas fa-lock"></i> Privacy protected
+        </div>
+    </div>
+</div>
+
+<script>
+    (function() {
+        const form = document.getElementById('loginForm');
+        const loginBtn = document.getElementById('loginBtn');
+        let isSubmitting = false;
+
+        // Enhance form fields with additional styling (ensure consistent)
+        function enhanceFields() {
+            const inputs = document.querySelectorAll('.field-wrapper input');
+            inputs.forEach(input => {
+                if (!input.classList.contains('enhanced')) {
+                    input.classList.add('enhanced');
+                    if (input.type === 'password') {
+                        input.setAttribute('autocomplete', 'current-password');
+                    }
+                }
+            });
+        }
+
+        // Client-side validation and loading state
+        form.addEventListener('submit', function(event) {
+            // Find username/email and password fields
+            const usernameField = document.querySelector('input[name="username"], input[name="email"]');
+            const passwordField = document.querySelector('input[name="password"]');
+            
+            if (usernameField && !usernameField.value.trim()) {
+                event.preventDefault();
+                usernameField.style.borderColor = '#dc2626';
+                usernameField.focus();
+                showFieldError(usernameField, 'Please enter your username or email');
+                return false;
+            }
+            
+            if (passwordField && !passwordField.value) {
+                event.preventDefault();
+                passwordField.style.borderColor = '#dc2626';
+                passwordField.focus();
+                showFieldError(passwordField, 'Please enter your password');
+                return false;
+            }
+            
+            if (isSubmitting) {
+                event.preventDefault();
+                return false;
+            }
+            
+            // Show loading state
+            isSubmitting = true;
+            const originalText = loginBtn.innerHTML;
+            loginBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Signing in...';
+            loginBtn.disabled = true;
+            
+            // Re-enable after 10 seconds timeout (fallback)
+            setTimeout(() => {
+                if (loginBtn.disabled) {
+                    loginBtn.disabled = false;
+                    loginBtn.innerHTML = originalText;
+                    isSubmitting = false;
+                }
+            }, 10000);
+            
+            return true;
+        });
+        
+        // Helper to show field error and auto-clear on input
+        function showFieldError(field, message) {
+            // Remove existing error message for this field
+            const wrapper = field.closest('.field-wrapper');
+            let existingError = wrapper.querySelector('.client-error');
+            if (existingError) existingError.remove();
+            
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'errorlist client-error';
+            errorDiv.style.marginTop = '0.4rem';
+            errorDiv.innerHTML = `<li>${message}</li>`;
+            wrapper.appendChild(errorDiv);
+            
+            field.addEventListener('input', function clearError() {
+                field.style.borderColor = '';
+                const err = wrapper.querySelector('.client-error');
+                if (err) err.remove();
+                field.removeEventListener('input', clearError);
+            }, { once: true });
+        }
+        
+        // Reset button state on page load (if there are form errors from backend)
+        window.addEventListener('load', function() {
+            enhanceFields();
+            
+            // Check if there are any error messages (from Django backend)
+            const hasErrors = document.querySelectorAll('.errorlist').length > 0;
+            if (hasErrors && loginBtn) {
+                loginBtn.disabled = false;
+                loginBtn.innerHTML = '<i class="fas fa-arrow-right-to-bracket"></i> Sign In';
+                isSubmitting = false;
+            } else {
+                if (loginBtn) {
+                    loginBtn.disabled = false;
+                    loginBtn.innerHTML = '<i class="fas fa-arrow-right-to-bracket"></i> Sign In';
+                    isSubmitting = false;
+                }
+            }
+            
+            // Auto-focus on first input field
+            const firstInput = document.querySelector('.field-wrapper input');
+            if (firstInput && !firstInput.value) {
+                firstInput.focus();
+            }
+            
+            // Password show/hide toggle (optional feature)
+            addPasswordToggle();
+        });
+        
+        // Add password visibility toggle
+        function addPasswordToggle() {
+            const passwordInput = document.querySelector('input[name="password"]');
+            if (!passwordInput) return;
+            
+            const wrapper = passwordInput.closest('.field-wrapper');
+            const toggleBtn = document.createElement('i');
+            toggleBtn.className = 'far fa-eye-slash password-toggle';
+            toggleBtn.style.position = 'absolute';
+            toggleBtn.style.right = '1rem';
+            toggleBtn.style.top = '2.5rem';
+            toggleBtn.style.transform = 'translateY(-50%)';
+            toggleBtn.style.cursor = 'pointer';
+            toggleBtn.style.color = '#94a3b8';
+            toggleBtn.style.fontSize = '0.9rem';
+            toggleBtn.style.zIndex = '3';
+            
+            toggleBtn.addEventListener('click', function() {
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+                toggleBtn.classList.toggle('fa-eye-slash');
+                toggleBtn.classList.toggle('fa-eye');
+            });
+            
+            wrapper.appendChild(toggleBtn);
+        }
+        
+        // Social login placeholders (optional)
+        const googleBtn = document.getElementById('googleLogin');
+        const githubBtn = document.getElementById('githubLogin');
+        
+        if (googleBtn) {
+            googleBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                alert('Google authentication would be integrated here.\nConfigure OAuth in your Django app.');
+            });
+        }
+        
+        if (githubBtn) {
+            githubBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                alert('GitHub authentication would be integrated here.\nConfigure OAuth in your Django app.');
+            });
+        }
+        
+        // Forgot password placeholder
+        const forgotLink = document.querySelector('.forgot-link');
+        if (forgotLink) {
+            forgotLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                alert('Password reset functionality will redirect to reset page.\nImplement in your Django views.');
+            });
+        }
+        
+        // Remember me functionality can be saved in backend, just visual for now
+        const rememberCheckbox = document.getElementById('rememberMe');
+        if (rememberCheckbox && localStorage.getItem('remember_me') === 'true') {
+            rememberCheckbox.checked = true;
+        }
+        
+        rememberCheckbox?.addEventListener('change', function() {
+            localStorage.setItem('remember_me', this.checked);
+        });
+        
+        // Remove client-side errors on input focus
+        document.querySelectorAll('.field-wrapper input').forEach(input => {
+            input.addEventListener('focus', function() {
+                this.style.borderColor = '';
+                const wrapper = this.closest('.field-wrapper');
+                const clientError = wrapper?.querySelector('.client-error');
+                if (clientError) clientError.remove();
+            });
+        });
+    })();
+</script>
+
+<style>
+    /* Additional overrides for better Django form compatibility */
+    .field-wrapper input, 
+    .field-wrapper select, 
+    .field-wrapper textarea {
+        width: 100%;
+    }
+    
+    .password-toggle {
+        background: transparent;
+        padding: 0.3rem;
+        border-radius: 50%;
+        transition: color 0.2s;
+    }
+    
+    .password-toggle:hover {
+        color: #4f46e5;
+    }
+    
+    .errorlist.nonfield {
+        background: #fee2e2;
+        padding: 0.6rem 1rem;
+        border-radius: 0.8rem;
+        margin-bottom: 1.2rem;
+    }
+    
+    .helptext {
+        font-size: 0.7rem;
+        color: #6c727f;
+    }
+    
+    button:disabled {
+        cursor: not-allowed;
+        opacity: 0.7;
+    }
+    
+    .field-wrapper .errorlist {
+        margin-top: 0.4rem;
+    }
+    
+    /* smooth transitions */
+    .field-wrapper input {
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    
+    /* remove default outline for better appearance */
+    .field-wrapper input:focus {
+        outline: none;
+    }
+    
+    /* style for remember me checkbox */
+    .remember-me span {
+        user-select: none;
+    }
+</style>
+
+</body>
+</html>

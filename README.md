@@ -179,7 +179,7 @@ pip install python-dotenv
 
 ---
 
-## 📷 Project Screenshots
+## 📷 Project Outputs
 
 <img width="1893" height="910" alt="home_rag" src="https://github.com/user-attachments/assets/7468bab9-53e6-4a7f-8b00-1ff79481754b" />
 

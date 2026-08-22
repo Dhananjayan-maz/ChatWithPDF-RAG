@@ -10,7 +10,6 @@ from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain_google_genai import ChatGoogleGenerativeAI
 
-
 def signup_view(request):
     if request.method == "POST":
         form = UserForm(request.POST)
@@ -68,7 +67,7 @@ def upload_pdf(request):
 
         # Create embeddings
         embedding = HuggingFaceEmbeddings(
-            model_name="sentence-transformers/all-MiniLM-L6-v2"
+            model_name="BAAI/bge-large-en-v1.5"
         )
 
         # Convert to vectors
@@ -80,25 +79,6 @@ def upload_pdf(request):
         db = FAISS.from_documents(chunks, embedding)
 
         db.save_local("faiss_index")
-
-        # # Display chunk text safely
-        # for i, chunk in enumerate(chunks):
-
-        #     extracted_text += (
-        #         f"\n\n----- Chunk {i+1} -----\n"
-        #     )
-
-        #     extracted_text += (
-        #         chunk.page_content or ""
-        #     )
-
-        # extracted_text += (
-        #     f"\n\nTotal vectors created: {len(vectors)}"
-        # )
-
-        # extracted_text += (
-        #     "\n\nFAISS index created successfully"
-        # )
 
         return redirect("chat")
 
@@ -121,7 +101,7 @@ def chat(request):
         question = request.POST["question"]
 
         embedding = HuggingFaceEmbeddings(
-            model_name="sentence-transformers/all-MiniLM-L6-v2"
+            model_name="BAAI/bge-large-en-v1.5"
         )
 
         db = FAISS.load_local(
